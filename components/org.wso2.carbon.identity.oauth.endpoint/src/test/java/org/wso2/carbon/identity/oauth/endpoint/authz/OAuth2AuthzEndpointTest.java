@@ -829,23 +829,8 @@ public class OAuth2AuthzEndpointTest extends TestOAuthEndpointBase {
         }
     }
 
-    @DataProvider(name = "provideAuthenticatedDataDevice")
-    public Object[][] provideAuthenticatedDataDevice() {
-
-        return addDiagnosticLogStatusToExistingDataProvider(new Object[][]{
-                {true, true, new HashMap(), null, null, null,
-                        new HashSet<>(Collections.singletonList(OAuthConstants.Scope.OPENID)),
-                        RESPONSE_MODE_FORM_POST, APP_REDIRECT_URL, HttpServletResponse.SC_FOUND}
-        });
-    }
-
-    @Test(dataProvider = "provideAuthenticatedDataDevice", groups = "testWithConnection")
-    public void testAuthorizeForAuthenticationResponseForDevice(boolean isResultInRequest, boolean isAuthenticated,
-                                                       Map<ClaimMapping, String> attributes, String errorCode,
-                                                       String errorMsg, String errorUri, Set<String> scopes,
-                                                       String responseMode, String redirectUri, int expected,
-                                                       boolean diagnosticLogsEnabled)
-            throws Exception {
+    @Test(groups = "testWithConnection")
+    public void testAuthorizeForDeviceFlowAuthenticationResponse() throws Exception {
 
         try (MockedStatic<OAuthServerConfiguration> oAuthServerConfiguration = mockStatic(
                 OAuthServerConfiguration.class);) {
@@ -868,19 +853,10 @@ public class OAuth2AuthzEndpointTest extends TestOAuthEndpointBase {
                 sessionDataCache.when(SessionDataCache::getInstance).thenReturn(mockSessionDataCache);
                 SessionDataCacheKey loginDataCacheKey = new SessionDataCacheKey(SESSION_DATA_KEY_VALUE);
                 when(mockSessionDataCache.getValueFromCache(loginDataCacheKey)).thenReturn(loginCacheEntry);
-                loggerUtils.when(LoggerUtils::isDiagnosticLogsEnabled).thenReturn(diagnosticLogsEnabled);
+                loggerUtils.when(LoggerUtils::isDiagnosticLogsEnabled).thenReturn(false);
 
                 AuthenticationResult result =
-                        setAuthenticationResult(isAuthenticated, attributes, errorCode, errorMsg, errorUri);
-
-                AuthenticationResult resultInRequest = null;
-                AuthenticationResultCacheEntry authResultCacheEntry = null;
-                if (isResultInRequest) {
-                    resultInRequest = result;
-                } else {
-                    authResultCacheEntry = new AuthenticationResultCacheEntry();
-                    authResultCacheEntry.setResult(result);
-                }
+                        setAuthenticationResult(true, new HashMap<>(), null, null, null);
 
                 Map<String, String[]> requestParams = new HashMap<>();
                 Map<String, Object> requestAttributes = new HashMap<>();
@@ -891,7 +867,7 @@ public class OAuth2AuthzEndpointTest extends TestOAuthEndpointBase {
 
                 requestAttributes.put(FrameworkConstants.RequestParams.FLOW_STATUS, AuthenticatorFlowStatus.INCOMPLETE);
                 requestAttributes.put(FrameworkConstants.SESSION_DATA_KEY, SESSION_DATA_KEY_VALUE);
-                requestAttributes.put(FrameworkConstants.RequestAttribute.AUTH_RESULT, resultInRequest);
+                requestAttributes.put(FrameworkConstants.RequestAttribute.AUTH_RESULT, result);
 
                 mockHttpRequest(requestParams, requestAttributes, HttpMethod.POST);
 
@@ -904,7 +880,8 @@ public class OAuth2AuthzEndpointTest extends TestOAuthEndpointBase {
                 identityUtil.when(() -> IdentityUtil.getServerURL(anyString(), anyBoolean(), anyBoolean()))
                         .thenReturn("https://localhost:9443/carbon");
 
-                OAuth2Parameters oAuth2Params = setOAuth2Parameters(scopes, APP_NAME, responseMode, redirectUri);
+                Set<String> scopes = new HashSet<>(Collections.singletonList(OAuthConstants.Scope.OPENID));
+                OAuth2Parameters oAuth2Params = setOAuth2Parameters(scopes, APP_NAME, null, null);
                 oAuth2Params.setClientId(CLIENT_ID_VALUE);
                 oAuth2Params.setState(STATE);
                 oAuth2Params.setResponseType(Constants.RESPONSE_TYPE_DEVICE);
@@ -926,9 +903,8 @@ public class OAuth2AuthzEndpointTest extends TestOAuthEndpointBase {
                 OAuth2AuthorizeReqDTO authzReqDTO = new OAuth2AuthorizeReqDTO();
                 authzReqDTO.setConsumerKey(CLIENT_ID_VALUE);
                 authzReqDTO.setScopes(new String[]{OAuthConstants.Scope.OPENID});
-                authzReqDTO.setCallbackUrl(redirectUri);
+                authzReqDTO.setCallbackUrl(null);
                 authzReqDTO.setUser(loginCacheEntry.getLoggedInUser());
-                authzReqDTO.setResponseType(Constants.RESPONSE_TYPE_DEVICE);
                 OAuthAuthzReqMessageContext authzReqMsgCtx = new OAuthAuthzReqMessageContext(authzReqDTO);
                 authzReqMsgCtx.setApprovedScope(new String[]{OAuthConstants.Scope.OPENID});
                 when(oAuth2Service.validateScopesBeforeConsent(any(OAuth2AuthorizeReqDTO.class))).thenReturn(
@@ -950,19 +926,21 @@ public class OAuth2AuthzEndpointTest extends TestOAuthEndpointBase {
                 mockApplicationManagementService();
 
                 mockEndpointUtil(false, endpointUtil);
-                when(oAuth2Service.handleAuthenticationFailure(oAuth2Params)).thenReturn(oAuthErrorDTO);
                 when(oAuth2ScopeService.hasUserProvidedConsentForAllRequestedScopes(
                         anyString(), isNull(), anyInt(), anyList())).thenReturn(true);
+
+                OAuth2AuthorizeRespDTO authzRespDTO = new OAuth2AuthorizeRespDTO();
+                authzRespDTO.setCallbackURI("https://localhost:9443/authenticationendpoint/device_success.do" +
+                        "?app_name=" + APP_NAME);
+                when(oAuth2Service.authorize(authzReqMsgCtx)).thenReturn(authzRespDTO);
 
                 mockServiceURLBuilder(serviceURLBuilder);
                 setSupportedResponseModes();
                 Response response = oAuth2AuthzEndpoint.authorize(httpServletRequest, httpServletResponse);
-                assertEquals(response.getStatus(), expected, "Unexpected HTTP response status");
-                if (!isAuthenticated) {
-                    String expectedState =
-                            "name=\"" + OAuthConstants.OAuth20Params.STATE + "\" value=\"" + STATE + "\"";
-                    assertTrue(response.getEntity().toString().contains(expectedState));
-                }
+                assertEquals(response.getStatus(), HttpServletResponse.SC_FOUND, "Unexpected HTTP response status");
+                String expectedState = OAuthConstants.OAuth20Params.STATE + "=" + STATE;
+                MultivaluedMap<String, Object> responseMetadata = response.getMetadata();
+                assertTrue(responseMetadata.get("Location").toString().contains(expectedState));
             }
         }
     }
