@@ -45,6 +45,8 @@ import org.wso2.carbon.identity.role.v2.mgt.core.model.RoleBasicInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -81,11 +83,13 @@ public class RoleBasedScopeValidationHandler implements ScopeValidationHandler {
                         .getAccessingOrganization());
             }
             List<String> filteredRoleIds = getFilteredRoleIds(userRoles, scopeValidationContext.getAppId(),
+                    scopeValidationContext.getAppTenantDomain(),
                     tenantDomain);
             if (filteredRoleIds.isEmpty()) {
                 return new ArrayList<>();
             }
-            List<String> associatedScopes = AuthzUtil.getAssociatedScopesForRoles(filteredRoleIds, tenantDomain);
+            List<String> associatedScopes = AuthzUtil.getAssociatedScopesForRoles(filteredRoleIds,
+                    scopeValidationContext.getAppTenantDomain());
             /*
             TODO: Refactor this to drop internal_ scopes when getting associated scopes for roles.
             When user is not accessing the resident organization, retain only the internal_org_ scopes
@@ -118,11 +122,21 @@ public class RoleBasedScopeValidationHandler implements ScopeValidationHandler {
      * @return Filtered role ids.
      * @throws ScopeValidationHandlerException if an error occurs while retrieving filtered role id list.
      */
-    private List<String> getFilteredRoleIds(List<String> roleIds, String appId, String tenantDomain)
+    private List<String> getFilteredRoleIds(List<String> roleIds, String appId, String tenantDomain,
+                                            String subOrgTenantDomain)
             throws ScopeValidationHandlerException, IdentityOAuth2Exception, IdentityRoleManagementException {
 
+        List<String> mainRoleIds = roleIds;
         List<String> rolesAssociatedWithApp;
         String allowedAudience = getApplicationAllowedAudience(appId, tenantDomain);
+
+        if (!StringUtils.equals(tenantDomain, subOrgTenantDomain)) {
+            Map<String, String> mainRoleIdMap = OAuthComponentServiceHolder.getInstance()
+                    .getRoleV2ManagementService().getSharedRoleToMainRoleMappingsBySubOrg(roleIds, subOrgTenantDomain);
+            mainRoleIds = mainRoleIdMap.values().stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
 
         if (RoleConstants.APPLICATION.equalsIgnoreCase(allowedAudience)) {
             rolesAssociatedWithApp = getRoleIdsAssociatedWithApp(appId);
@@ -134,7 +148,7 @@ public class RoleBasedScopeValidationHandler implements ScopeValidationHandler {
                     .collect(Collectors.toList());
         }
 
-        return roleIds.stream()
+        return mainRoleIds.stream()
                 .distinct()
                 .filter(rolesAssociatedWithApp::contains)
                 .collect(Collectors.toList());

@@ -96,7 +96,9 @@ public class AuthzUtil {
                 return getSwitchUserRoles(authenticatedUser);
             }
         }
-        return getRoles(getUserId(authenticatedUser), authenticatedUser.getTenantDomain());
+        String userTenantDomain = authenticatedUser.getOrgUserTenantDomain() == null ?
+                authenticatedUser.getTenantDomain() : authenticatedUser.getOrgUserTenantDomain();
+        return getRoles(getUserId(authenticatedUser), userTenantDomain);
     }
 
     /**
