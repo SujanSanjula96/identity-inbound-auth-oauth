@@ -2455,7 +2455,11 @@ public class OAuth2Util {
         OAuthAppDO appDO;
         try {
             String tenantDomain = getTenantDomain();
-            appDO = getAppInformationByClientId(clientId, tenantDomain);
+            try {
+                appDO = getAppInformationByClientId(clientId, tenantDomain);
+            } catch (InvalidOAuthClientException e) {
+                appDO = getAppInformationByClientId(clientId, IdentityTenantUtil.resolveTenantDomain());
+            }
         } catch (IdentityOAuth2Exception e) {
             throw new IdentityOAuth2Exception("Error while retrieving app information for clientId: " + clientId, e);
         }
@@ -2645,6 +2649,7 @@ public class OAuth2Util {
     public static String getTenantDomainOfOauthApp(String clientId, String tenantDomain)
             throws IdentityOAuth2Exception, InvalidOAuthClientException {
 
+        String primaryTenantDomain = tenantDomain;
         String appOrgId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getApplicationResidentOrganizationId();
         if (StringUtils.isNotEmpty(appOrgId)) {
             try {
@@ -2655,7 +2660,12 @@ public class OAuth2Util {
                         appOrgId, e);
             }
         }
-        OAuthAppDO oAuthAppDO = getAppInformationByClientId(clientId, tenantDomain);
+        OAuthAppDO oAuthAppDO;
+        try {
+            oAuthAppDO = getAppInformationByClientId(clientId, tenantDomain);
+        } catch (InvalidOAuthClientException e) {
+            oAuthAppDO = getAppInformationByClientId(clientId, primaryTenantDomain);
+        }
         return getTenantDomainOfOauthApp(oAuthAppDO);
     }
 
