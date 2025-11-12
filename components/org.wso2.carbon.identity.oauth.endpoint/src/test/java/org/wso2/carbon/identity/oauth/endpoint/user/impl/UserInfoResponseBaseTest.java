@@ -45,6 +45,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -214,7 +215,7 @@ public class UserInfoResponseBaseTest {
                                      MockedStatic<IdentityTenantUtil> identityTenantUtil) throws Exception {
 
         oAuth2Util.when(() -> OAuth2Util.getClientIdForAccessToken(anyString())).thenReturn(MOCK_CLIENT_ID);
-        oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(any(OAuthAppDO.class))).thenReturn(TENANT_DOT_COM);
+        oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(any(OAuthAppDO.class))).thenReturn(Optional.of(TENANT_DOT_COM));
         identityTenantUtil.when(()->IdentityTenantUtil.getTenantDomain(anyInt())).thenReturn(TENANT_DOT_COM);
         ArrayList<String> userAttributesFromCache = new ArrayList<>();
         userAttributesFromCache.add("cachedClaim1");

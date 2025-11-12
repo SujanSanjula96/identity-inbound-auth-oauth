@@ -65,6 +65,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -382,7 +383,7 @@ public class OAuth2CibaEndpointTest {
             when(httpServletRequest.getAttribute(OAuthConstants.CLIENT_AUTHN_CONTEXT)).thenReturn(
                     oAuthClientAuthnContext);
 
-            oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO)).thenReturn("super");
+            oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO)).thenReturn(Optional.of("super"));
             oAuth2Util.when(() -> OAuth2Util.getIdTokenIssuer("super"))
                     .thenReturn("https://localhost:9443/oauth2/ciba");
             oAuth2Util.when(() -> OAuth2Util.buildScopeString(any())).thenReturn("scope1 scope2 openid");

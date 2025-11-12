@@ -61,6 +61,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -465,9 +466,9 @@ public class OIDCLogoutServletTest extends TestOIDCSessionBase {
             lenient().when(request.getParameter("post_logout_redirect_uri")).thenReturn(postLogoutUrl);
 
             oAuth2Util.when(() -> OAuth2Util.getAppInformationByClientId(anyString())).thenCallRealMethod();
-            oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(anyString())).thenReturn("wso2.com");
+            oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(anyString())).thenReturn(Optional.of("wso2.com"));
             oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(any(oAuthAppDO.getClass())))
-                    .thenReturn("wso2.com");
+                    .thenReturn(Optional.of("wso2.com"));
 
             mockServiceURLBuilder(OIDCSessionConstants.OIDCEndpoints.OIDC_LOGOUT_ENDPOINT, serviceURLBuilder);
 
@@ -581,7 +582,7 @@ public class OIDCLogoutServletTest extends TestOIDCSessionBase {
 
             oAuth2Util.when(() -> OAuth2Util.getAppInformationByClientId(anyString())).thenCallRealMethod();
             oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(any(oAuthAppDO.getClass())))
-                    .thenReturn("wso2.com");
+                    .thenReturn(Optional.of("wso2.com"));
 
             identityTenantUtil.when(() -> IdentityTenantUtil.getTenantId(anyString())).thenReturn(TENANT_ID);
             identityTenantUtil.when(IdentityTenantUtil::getLoginTenantId).thenReturn(TENANT_ID);

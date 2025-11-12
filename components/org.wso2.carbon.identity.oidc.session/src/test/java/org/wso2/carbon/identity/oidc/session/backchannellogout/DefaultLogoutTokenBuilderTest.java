@@ -57,6 +57,7 @@ import java.security.cert.Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -167,7 +168,7 @@ public class DefaultLogoutTokenBuilderTest {
             oAuth2UtilMockedStatic.when(() -> OAuth2Util.getAppInformationByClientId(anyString()))
                     .thenReturn(appDO);
             oAuth2UtilMockedStatic.when(() -> OAuth2Util.getTenantDomainOfOauthApp(any(OAuthAppDO.class)))
-                    .thenReturn(tenantDomain);
+                    .thenReturn(Optional.of(tenantDomain));
             oAuth2UtilMockedStatic.when(() -> OAuth2Util.signJWT(any(), any(), any()))
                     .thenReturn(jwt);
 

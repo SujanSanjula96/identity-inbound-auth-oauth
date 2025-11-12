@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -503,7 +504,7 @@ public class ClaimUtilTest {
         oAuth2Util.when(() -> OAuth2Util.getAuthenticatedUser(any(AccessTokenDO.class))).thenCallRealMethod();
         oAuth2Util.when(() -> OAuth2Util.isFederatedUser(any(AuthenticatedUser.class))).thenCallRealMethod();
         oAuth2Util.when(() -> OAuth2Util.getAppInformationByClientId(anyString())).thenReturn(mockedOAuthAppDO);
-        oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(any(OAuthAppDO.class))).thenReturn("carbon.super");
+        oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(any(OAuthAppDO.class))).thenReturn(Optional.of("carbon.super"));
         oAuth2Util.when(() -> OAuth2Util.getServiceProvider(anyString(), anyString())).thenCallRealMethod();
     }
 

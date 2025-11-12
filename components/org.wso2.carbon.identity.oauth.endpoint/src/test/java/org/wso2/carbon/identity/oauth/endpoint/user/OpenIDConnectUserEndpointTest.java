@@ -37,6 +37,7 @@ import org.wso2.carbon.identity.oauth2.dto.OAuth2TokenValidationResponseDTO;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -146,7 +147,7 @@ public class OpenIDConnectUserEndpointTest {
             when(userInfoResponseBuilder.getResponseString(tokenResponse)).thenReturn(authResponse);
             when(mockUserInfoEndpointConfig.getUserInfoResponseBuilder()).thenReturn(userInfoResponseBuilder);
 
-            oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(appDO)).thenReturn("test");
+            oAuth2Util.when(() -> OAuth2Util.getTenantDomainOfOauthApp(appDO)).thenReturn(Optional.of("test"));
             oAuth2Util.when(() -> OAuth2Util.getTenantId(anyString())).thenReturn(-1234);
             oAuth2Util.when(() -> OAuth2Util.getAppInformationByClientId(anyString())).thenReturn(appDO);
             oAuth2Util.when(() -> OAuth2Util.getClientIdForAccessToken(anyString())).thenReturn(clientID);
