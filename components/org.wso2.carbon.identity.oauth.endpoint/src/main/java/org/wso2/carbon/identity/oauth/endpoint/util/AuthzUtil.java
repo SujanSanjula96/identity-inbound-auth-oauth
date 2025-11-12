@@ -1302,7 +1302,7 @@ public class AuthzUtil {
 
         // load the SP tenant domain from the OAuth App info
         authorizeRequestMessageContext.getAuthorizationReqDTO()
-                .setTenantDomain(OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO));
+                .setTenantDomain(OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null));
 
         // load requested scopes
         authorizeRequestMessageContext.setRequestedScopes(authzReqDTO.getScopes());
@@ -2834,7 +2834,7 @@ public class AuthzUtil {
         try {
             // At this point we have verified that a valid app exists for the client_id. So we directly get the SP
             // tenantDomain.
-            return OAuth2Util.getTenantDomainOfOauthApp(clientId);
+            return OAuth2Util.getTenantDomainOfOauthApp(clientId).orElse(null);
         } catch (InvalidOAuthClientException | IdentityOAuth2Exception e) {
             throw new InvalidRequestException("Error retrieving Service Provider tenantDomain for client_id: "
                     + clientId, OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ErrorCodes.OAuth2SubErrorCodes

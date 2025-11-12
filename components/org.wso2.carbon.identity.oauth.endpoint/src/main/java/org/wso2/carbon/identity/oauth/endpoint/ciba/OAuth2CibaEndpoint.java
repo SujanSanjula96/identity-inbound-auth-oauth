@@ -293,7 +293,7 @@ public class OAuth2CibaEndpoint {
         try {
             // At this point we have verified that a valid app exists for the client_id. So we directly get the SP
             // tenantDomain.
-            return OAuth2Util.getTenantDomainOfOauthApp(clientId);
+            return OAuth2Util.getTenantDomainOfOauthApp(clientId).orElse(null);
         } catch (InvalidOAuthClientException | IdentityOAuth2Exception e) {
             if (log.isDebugEnabled()) {
                 log.debug(OAuth2ErrorCodes.INVALID_REQUEST, e);

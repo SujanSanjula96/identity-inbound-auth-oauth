@@ -369,7 +369,7 @@ public class OIDCLogoutServlet extends HttpServlet {
             if (StringUtils.isBlank(clientId)) {
                 clientId = getClientIdFromIdToken(request, idTokenHint);
             }
-            appTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(clientId);
+            appTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(clientId).orElse(null);
             validateRequestTenantDomain(appTenantDomain);
             OAuthAppDO oAuthAppDO = OAuth2Util.getAppInformationByClientId(clientId);
             String spName = getServiceProviderName(clientId, appTenantDomain);
@@ -469,7 +469,7 @@ public class OIDCLogoutServlet extends HttpServlet {
             String clientId = extractClientFromIdToken(idToken);
             if (isJWTSignedWithSPKey) {
                 OAuthAppDO oAuthAppDO = OAuth2Util.getAppInformationByClientId(clientId);
-                tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+                tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null);
                 if (log.isDebugEnabled()) {
                     log.debug("JWT signature will be validated with the service provider's tenant domain : " +
                             tenantDomain);

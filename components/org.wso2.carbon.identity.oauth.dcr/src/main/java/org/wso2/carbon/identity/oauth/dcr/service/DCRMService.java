@@ -1159,7 +1159,7 @@ public class DCRMService {
     private void validateRequestTenantDomain(String clientId, String tenantDomain) throws DCRMException {
 
         try {
-            String tenantDomainOfApp = OAuth2Util.getTenantDomainOfOauthApp(clientId, tenantDomain);
+            String tenantDomainOfApp = OAuth2Util.getTenantDomainOfOauthApp(clientId, tenantDomain).orElse(null);
             OAuth2Util.validateRequestTenantDomain(tenantDomainOfApp);
         } catch (InvalidOAuthClientException e) {
             throw new DCRMClientException(DCRMConstants.ErrorMessages.TENANT_DOMAIN_MISMATCH.getErrorCode(),

@@ -148,7 +148,7 @@ public class OAuth2ScopeService implements ScopeMetadataService {
         String tenantDomain;
         try {
             OAuthAppDO oAuthAppDO = OAuth2Util.getAppInformationByClientId(clientId);
-            tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+            tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null);
         } catch (IdentityOAuth2Exception | InvalidOAuthClientException e) {
             log.error("Error while getting oauth app for client Id: " + clientId, e);
             throw Oauth2ScopeUtils.generateServerException(Oauth2ScopeConstants.ErrorMessages.

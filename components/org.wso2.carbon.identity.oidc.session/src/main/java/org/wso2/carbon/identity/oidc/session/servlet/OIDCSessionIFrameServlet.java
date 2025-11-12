@@ -82,7 +82,7 @@ public class OIDCSessionIFrameServlet extends HttpServlet {
             String callbackURL = getCallbackURL(request, clientId);
             String clientOrigin = OIDCSessionManagementUtil.getOrigin(callbackURL);
             // Validate application's tenant with the tenant from the context.
-            String tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(clientId);
+            String tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(clientId).orElse(null);
             OAuth2Util.validateRequestTenantDomain(tenantDomain);
             if (log.isDebugEnabled()) {
                 log.debug("Client Origin : " + clientOrigin);

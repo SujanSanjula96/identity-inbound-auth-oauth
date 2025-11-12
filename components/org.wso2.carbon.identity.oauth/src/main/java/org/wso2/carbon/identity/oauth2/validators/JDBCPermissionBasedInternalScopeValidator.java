@@ -159,7 +159,7 @@ public class JDBCPermissionBasedInternalScopeValidator {
                 isFederatedRoleBasedAuthzEnabled = OAuth2Util.isFederatedRoleBasedAuthzEnabled(clientId);
                 if (isFederatedRoleBasedAuthzEnabled) {
                     OAuthAppDO app = OAuth2Util.getAppInformationByClientId(clientId);
-                    tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(app);
+                    tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(app).orElse(tenantDomain);
                 }
             }
             int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);

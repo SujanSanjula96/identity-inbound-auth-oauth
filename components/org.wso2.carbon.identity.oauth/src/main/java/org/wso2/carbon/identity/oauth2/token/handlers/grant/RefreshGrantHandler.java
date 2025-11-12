@@ -425,7 +425,7 @@ public class RefreshGrantHandler extends AbstractAuthorizationGrantHandler {
                             FrameworkUtils.getFederatedAssociationManager();
                     OAuthAppDO oAuthAppDO =
                             (OAuthAppDO) oAuthTokenReqMessageContext.getProperty(AccessTokenIssuer.OAUTH_APP_DO);
-                    String oAuthAppTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+                    String oAuthAppTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null);
                     String associatedLocalUsername =
                             federatedAssociationManager.getUserForFederatedAssociation(oAuthAppTenantDomain,
                                     authenticatedUser.getFederatedIdPName(),

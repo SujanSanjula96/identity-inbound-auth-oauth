@@ -1532,7 +1532,7 @@ public class EndpointUtil {
 
         try {
             OAuthAppDO oAuthAppDO = OAuth2Util.getAppInformationByClientId(clientId);
-            return OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+            return OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         } catch (IdentityOAuth2Exception e) {
             log.error("Error while getting oauth app for client Id: " + clientId, e);
             return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;

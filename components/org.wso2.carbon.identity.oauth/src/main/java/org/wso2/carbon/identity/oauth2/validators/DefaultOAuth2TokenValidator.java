@@ -79,7 +79,7 @@ public class DefaultOAuth2TokenValidator implements OAuth2TokenValidator {
         if (ArrayUtils.isEmpty(scopeValidators)) {
             if (log.isDebugEnabled()) {
                 log.debug(String.format("There is no scope validator registered for %s@%s", app.getApplicationName(),
-                        OAuth2Util.getTenantDomainOfOauthApp(app)));
+                        OAuth2Util.getTenantDomainOfOauthApp(app).orElse(null)));
             }
             return true;
         }
@@ -105,7 +105,7 @@ public class DefaultOAuth2TokenValidator implements OAuth2TokenValidator {
         if (!appScopeValidators.isEmpty()) {
             throw new IdentityOAuth2Exception(String.format("The scope validators %s registered for application %s@%s" +
                             " are not found in the server configuration ", StringUtils.join(appScopeValidators, ", "),
-                    app.getApplicationName(), OAuth2Util.getTenantDomainOfOauthApp(app)));
+                    app.getApplicationName(), OAuth2Util.getTenantDomainOfOauthApp(app).orElse(null)));
         }
 
         // Deriving the global level scope validator implementations.

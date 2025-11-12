@@ -154,7 +154,7 @@ public class Oauth2ScopeUtils {
         if (ArrayUtils.isEmpty(scopeValidators)) {
             if (log.isDebugEnabled()) {
                 log.debug(String.format("There is no scope validator registered for %s@%s",
-                        oAuthAppDO.getApplicationName(), OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO)));
+                        oAuthAppDO.getApplicationName(), OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null)));
             }
             return true;
         }
@@ -174,7 +174,7 @@ public class Oauth2ScopeUtils {
         if (!appScopeValidators.isEmpty()) {
             throw new IdentityOAuth2Exception(String.format("The scope validators %s registered for application " +
                     "%s@%s are not found in the server configuration ", StringUtils.join(appScopeValidators,
-                    ", "), oAuthAppDO.getApplicationName(), OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO)));
+                    ", "), oAuthAppDO.getApplicationName(), OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null)));
         }
         return true;
     }

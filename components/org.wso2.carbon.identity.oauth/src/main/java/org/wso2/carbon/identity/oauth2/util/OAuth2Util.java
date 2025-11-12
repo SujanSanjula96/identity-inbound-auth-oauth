@@ -2622,15 +2622,15 @@ public class OAuth2Util {
      * Get the tenant domain of an oauth application
      *
      * @param oAuthAppDO
-     * @return
+     * @return Optional containing the tenant domain, or Optional with the super tenant domain name if not found
      */
-    public static String getTenantDomainOfOauthApp(OAuthAppDO oAuthAppDO) {
+    public static Optional<String> getTenantDomainOfOauthApp(OAuthAppDO oAuthAppDO) {
 
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         if (oAuthAppDO != null && oAuthAppDO.getUser() != null) {
             tenantDomain = oAuthAppDO.getUser().getTenantDomain();
         }
-        return tenantDomain;
+        return Optional.ofNullable(tenantDomain);
     }
 
     /**
@@ -2638,11 +2638,11 @@ public class OAuth2Util {
      * the carbon context.
      *
      * @param clientId Consumer key of Application.
-     * @return Tenant Domain.
+     * @return Optional containing the tenant domain.
      * @throws IdentityOAuth2Exception     Error while retrieving the application.
      * @throws InvalidOAuthClientException If an application not found for the given client ID.
      */
-    public static String getTenantDomainOfOauthApp(String clientId)
+    public static Optional<String> getTenantDomainOfOauthApp(String clientId)
             throws IdentityOAuth2Exception, InvalidOAuthClientException {
 
         OAuthAppDO oAuthAppDO = getAppInformationByClientId(clientId);
@@ -2654,11 +2654,12 @@ public class OAuth2Util {
      * the carbon context.
      *
      * @param clientId Consumer key of Application.
-     * @return Tenant Domain.
+     * @param tenantDomain Tenant domain.
+     * @return Optional containing the tenant domain.
      * @throws IdentityOAuth2Exception     Error while retrieving the application.
      * @throws InvalidOAuthClientException If an application not found for the given client ID.
      */
-    public static String getTenantDomainOfOauthApp(String clientId, String tenantDomain)
+    public static Optional<String> getTenantDomainOfOauthApp(String clientId, String tenantDomain)
             throws IdentityOAuth2Exception, InvalidOAuthClientException {
 
         String appOrgId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getApplicationResidentOrganizationId();
@@ -2895,7 +2896,7 @@ public class OAuth2Util {
             String clientId = signedJWTIdToken.getJWTClaimsSet().getAudience().get(0);
             if (isJWTSignedWithSPKey) {
                 OAuthAppDO oAuthAppDO = OAuth2Util.getAppInformationByClientId(clientId);
-                tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+                tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null);
             } else {
                 //It is not sending tenant domain with the subject in id_token by default, So to work this as
                 //expected, need to enable the option "Use tenant domain in local subject identifier" in SP config
@@ -4298,7 +4299,7 @@ public class OAuth2Util {
         ApplicationManagementService applicationMgtService = OAuth2ServiceComponentHolder.getApplicationMgtService();
         String tenantDomain = IdentityTenantUtil.getTenantDomain(IdentityTenantUtil.getLoginTenantId());
         try {
-            tenantDomain = getTenantDomainOfOauthApp(clientId, tenantDomain);
+            tenantDomain = getTenantDomainOfOauthApp(clientId, tenantDomain).orElse(tenantDomain);
             // Get the Service Provider.
             return applicationMgtService.getServiceProviderByClientId(
                     clientId, IdentityApplicationConstants.OAuth2.NAME, tenantDomain);
@@ -5680,7 +5681,7 @@ public class OAuth2Util {
                 }
                 throw new IdentityOAuth2Exception(e.getMessage(), e);
             }
-            String appTenantDomain = getTenantDomainOfOauthApp(app);
+            String appTenantDomain = getTenantDomainOfOauthApp(app).orElse(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
             if (StringUtils.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, appTenantDomain)
                     && federatedRoleBasedAuthzApps.contains(app.getApplicationName())) {
                 isFederatedRoleBasedAuthzEnabled = true;

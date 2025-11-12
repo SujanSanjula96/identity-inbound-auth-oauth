@@ -2108,7 +2108,7 @@ public class OAuthAdminServiceImpl {
 
         String tenantDomain;
         try {
-            tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(consumerKey);
+            tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(consumerKey).orElse(null);
         } catch (IdentityOAuth2Exception e) {
             String errorMsg = String.format("Error occurred while retrieving tenant domain of OAuth app with " +
                     "consumer key: %s.", consumerKey);

@@ -852,7 +852,7 @@ public class TokenValidationHandler {
 
     private ServiceProvider getServiceProvider(String consumerKey) throws IdentityApplicationManagementException,
             IdentityOAuth2Exception, InvalidOAuthClientException {
-        String spTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(consumerKey);
+        String spTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(consumerKey).orElse(null);
         return OAuth2ServiceComponentHolder.getApplicationMgtService().getServiceProviderByClientId(consumerKey,
                 OAuthConstants.Scope.OAUTH2, spTenantDomain);
     }

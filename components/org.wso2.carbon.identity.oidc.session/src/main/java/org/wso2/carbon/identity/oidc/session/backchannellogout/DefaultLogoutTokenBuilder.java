@@ -370,7 +370,7 @@ public class DefaultLogoutTokenBuilder implements LogoutTokenBuilder {
      */
     private String getTenanatDomain(OAuthAppDO oAuthAppDO) {
 
-        String tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+        String tenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null);
         return tenantDomain;
     }
 

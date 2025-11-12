@@ -369,7 +369,7 @@ public abstract class AbstractUserInfoResponseBuilder implements UserInfoRespons
             throw new UserInfoEndpointException(
                     "Error while retrieving OAuth app information for clientId: " + clientId);
         }
-        return OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+        return OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null);
     }
 
     private ServiceProvider getServiceProvider(String tenantDomain, String clientId) throws UserInfoEndpointException {

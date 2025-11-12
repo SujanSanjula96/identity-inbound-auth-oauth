@@ -329,7 +329,7 @@ public class AccessTokenIssuer {
         // set the tenantDomain of the SP in the tokenReqDTO
         // Indirectly we can say that the tenantDomain of the SP is the tenantDomain of the user who created SP.
         // This is done to avoid having to send the tenantDomain as a query param to the token endpoint
-        String tenantDomainOfApp = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+        String tenantDomainOfApp = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null);
         validateRequestTenantDomain(tenantDomainOfApp, tokenReqDTO);
 
         tokenReqDTO.setTenantDomain(tenantDomainOfApp);

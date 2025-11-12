@@ -189,7 +189,7 @@ public class ClaimUtil {
                 spTenantDomain = appResidentTenantDomain;
             } else {
                 OAuthAppDO oAuthAppDO = OAuth2Util.getAppInformationByClientId(clientId);
-                spTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO);
+                spTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null);
             }
 
             ServiceProvider serviceProvider = OAuth2Util.getServiceProvider(clientId, spTenantDomain);

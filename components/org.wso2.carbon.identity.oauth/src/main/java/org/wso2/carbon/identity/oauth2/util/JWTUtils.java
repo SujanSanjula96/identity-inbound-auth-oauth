@@ -317,7 +317,7 @@ public class JWTUtils {
                 if (!isFragmentApp(serviceProviderProperties)) {
                     return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
                 }
-                return OAuth2Util.getTenantDomainOfOauthApp(accessTokenDO.getConsumerKey());
+                return OAuth2Util.getTenantDomainOfOauthApp(accessTokenDO.getConsumerKey()).orElse(null);
             } catch (InvalidOAuthClientException e) {
                 throw new IdentityOAuth2Exception("Error while getting tenant domain from OAuth app with consumer key: "
                         + accessTokenDO.getConsumerKey());

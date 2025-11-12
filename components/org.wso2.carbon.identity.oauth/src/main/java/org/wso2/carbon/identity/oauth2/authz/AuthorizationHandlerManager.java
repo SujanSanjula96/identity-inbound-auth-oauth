@@ -658,7 +658,7 @@ public class AuthorizationHandlerManager {
 
         // load the SP tenant domain from the OAuth App info
         authorizeRequestMessageContext.getAuthorizationReqDTO()
-                .setTenantDomain(OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO));
+                .setTenantDomain(OAuth2Util.getTenantDomainOfOauthApp(oAuthAppDO).orElse(null));
 
         // load requested scopes
         authorizeRequestMessageContext.setRequestedScopes(authzReqDTO.getScopes());

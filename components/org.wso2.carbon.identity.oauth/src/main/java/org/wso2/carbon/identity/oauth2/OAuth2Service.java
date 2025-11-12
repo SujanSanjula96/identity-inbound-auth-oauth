@@ -218,7 +218,7 @@ public class OAuth2Service extends AbstractAdmin {
         }
 
         try {
-            String appTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(clientId);
+            String appTenantDomain = OAuth2Util.getTenantDomainOfOauthApp(clientId).orElse(null);
             validateRequestTenantDomain(appTenantDomain);
 
             if (StringUtils.isBlank(clientId)) {
